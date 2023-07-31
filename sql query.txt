@@ -1,0 +1,97 @@
+--number of rows  into our dataset:
+
+SELECT count(*) AS total_rows1 FROM Dataset_first;
+SELECT count(*) AS total_rows2 FROM Dataset_sec;
+
+--Dataset for Jharkhand and Bihar
+
+SELECT * FROM Dataset_first
+WHERE State IN ('Jharkhand','Bihar');
+
+--Population of India
+
+SELECT SUM(population) AS Total_papolation FROM Dataset_sec;
+
+--Avg Growth
+
+SELECT state,AVG(growth)* 100 AS avg_growth FROM Dataset_first
+GROUP BY state;
+
+--avg sex retio
+
+SELECT state,Round(AVG(Sex_Ratio),0) AS avg_sex_retio FROM Dataset_first
+GROUP BY state
+ORDER BY avg_sex_retio DESC;
+
+--avg literacy rate
+
+SELECT state,ROUND(AVG(literacy),0) AS avg_literacy FROM Dataset_first
+GROUP BY state 
+HAVING ROUND(AVG(literacy),0) > 90
+ORDER BY avg_literacy DESC;
+
+--Top 3 state showing highest growth ratio
+
+SELECT TOP 3 state,AVG(growth)* 100 AS avg_growth FROM Dataset_first
+GROUP BY state ORDER BY avg_growth DESC;
+
+--bottom 3 state showing lowest sex ratio
+
+SELECT Top 3 state,Round(AVG(Sex_Ratio),0) AS avg_sex_retio FROM Dataset_first
+GROUP BY state
+ORDER BY avg_sex_retio ASC;
+
+--Top and bottom 3 states in literacy state:
+
+DROP TABLE IF EXISTS #topstates
+CREATE TABLE #topstates
+( state nvarchar(255),
+topstate float
+)
+
+Insert into #topstates
+SELECT TOP 3 state,Round(AVG(Literacy),0) AS avg_literacy_retio FROM Dataset_first
+GROUP BY state
+ORDER BY avg_literacy_retio DESC;
+
+SELECT * FROM #topstates ORDER BY #topstates.topstate DESC;
+
+
+DROP TABLE IF EXISTS #bottomstates
+CREATE TABLE #bottomstates
+( state nvarchar(255),
+bottomstate float
+)
+
+Insert into #bottomstates
+SELECT state,Round(AVG(Literacy),0) AS avg_literacy_retio FROM Dataset_first
+GROUP BY state
+ORDER BY avg_literacy_retio DESC;
+
+SELECT TOP 3 * FROM #bottomstates ORDER BY #bottomstates.bottomstate ASC;
+
+--union opertor
+
+SELECT * FROM (
+SELECT TOP 3 * FROM #topstates ORDER BY #topstates.topstate DESC) a
+
+UNION
+
+SELECT * FROM (
+SELECT TOP 3 * FROM #bottomstates ORDER BY #bottomstates.bottomstate ASC) b;
+
+
+-- States starting with letter a:
+
+SELECT DISTINCT [State ] FROM  Dataset_first WHERE LOWER(state) LIKE'a%'
+OR LOWER(State) LIKE 'b%';
+
+
+SELECT DISTINCT [State ] FROM  Dataset_first WHERE LOWER(state) LIKE'a%' 
+OR LOWER(State) LIKE '%d';
+
+---joining both table 
+
+SELECT a.district,a.state,a.sex_Ratio , b.Population 
+FROM  Dataset_first AS a INNER JOIN Dataset_sec AS b ON a.District = b.District;
+
